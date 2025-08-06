@@ -1,45 +1,89 @@
-import dotenv from 'dotenv';
-import RetirementCalculations from './Classes/RetirementCalculations.js';
+import User from './Classes/user.js';
 
-export function processRetirementCalculations(input) {
+export function processRetirement(input) {
   return new Promise(async (resolve) => {
-    try {
-      //Fanya hesabu zote
-      const report = RetirementCalculations.calculateReadinessScore(input);
+    // Basic validation
+    const requiredFields = [
+      'name', 'age', 'occupation', 'phone', 'email',
+      'ageToRetire', 'mounthlyExpenditure', 'saving', 'investment', 'asserts',
+      'healthInsurance', 'loan', 'loanAmount',
+      'willPlan', 'projects', 'mounthlyInvestmentPlan',
+      'mounthlyExpenditureAfterRetire', 'incomeEarnedFree', 'tenYearsPlan'
+    ];
 
-      // Hifadhi data kwenye DB
-      await RetirementCalculations.create({
-        ...input,
-        financialFreedomPercent: report.ffPercent + '%'
-      });
+    const missingFields = requiredFields.filter(field => input[field] === undefined || input[field] === '');
 
-      // Tafsiri kulingana na totalPercentage
-      let tafsiri = "";
-      if (report.totalPercentage >= 80) {
-        tafsiri = "Uko karibu sana kufikia uhuru wa kifedha! Endelea na mpango wa sasa na boresha uwekezaji kidogo kidogo.";
-      } else if (report.totalPercentage >= 50) {
-        tafsiri = "Njia ipo, lakini kuna mapungufu makubwa. Unahitaji kuongeza uwekezaji, kulipa madeni, na kupanga miradi ya kipato endelevu.";
-      } else {
-        tafsiri = "Safari ni ndefu. Hakikisha una mpango madhubuti wa kifedha na ongeza nidhamu ya uwekezaji ili kufikia malengo yako.";
-      }
-
-      // Rudisha majibu yote
-      resolve({
-        status: 1,
-        msg: "success",
-        totalPercentage: report.totalPercentage,
-        sectionPercentages: report.breakdown.percentages,
-        rawScores: report.breakdown.scores,
-        netWealth: report.netWealth,
-        ffPercent: report.ffPercent,
-        tafsiri
-      });
-
-    } catch (error) {
-      resolve({
+    if (missingFields.length > 0) {
+      return resolve({
         status: 0,
-        msg: "Server error: " + error.message
+        msg: `Missing required field(s): ${missingFields.join(', ')}`
       });
     }
+
+    // Continue with calculation
+    const yearsLeftBeforeRetire = input.ageToRetire - input.age;
+    const financialFreedom = input.mounthlyExpenditure * 100;
+    const percentFinancialFreedom = ((input.investment + input.asserts - input.loanAmount) / financialFreedom) * 100;
+
+    let score1 = 0;
+    score1 += yearsLeftBeforeRetire > 15 ? 5 : yearsLeftBeforeRetire >= 5 ? 3 : 1;
+    score1 += input.mounthlyExpenditure < 1000000 ? 5 : input.mounthlyExpenditure <= 3000000 ? 3 : 1;
+    const investRatio = ((input.investment + input.asserts) / financialFreedom) * 100;
+    score1 += investRatio > 50 ? 5 : investRatio >= 20 ? 3 : 1;
+
+    let score2 = 0;
+    if (percentFinancialFreedom >= 80) score2 = 15;
+    else if (percentFinancialFreedom >= 50) score2 = 10;
+    else if (percentFinancialFreedom >= 20) score2 = 5;
+    else score2 = 3;
+
+    let score3 = 0;
+    if (input.healthInsurance) score3 += 3;
+    if (!input.loan) score3 += 3;
+    if (input.projects) score3 += 4;
+
+    let score4 = 0;
+    if (input.willPlan) score4 += 5;
+    if (input.mounthlyInvestmentPlan) score4 += 5;
+
+    const score = score1 + score2 + score3 + score4;
+    const totalPercentage = (score / 50) * 100;
+
+    let feedback = '';
+    if (totalPercentage <= 30) feedback = 'Hatari kubwa! Hujajiandaa kifedha.';
+    else if (totalPercentage <= 60) feedback = 'Kuna mapengo makubwa, unahitaji marekebisho.';
+    else if (totalPercentage <= 90) feedback = 'Unaelekea salama, bado unahitaji kuboresha.';
+    else feedback = 'Uko salama kifedha kwa kustaafu.';
+
+    const userData = {
+      ...input,
+      yearsLeftBeforeRetire,
+      financialFreedom,
+      percentFinancialFreedom,
+      score,
+      totalPercentage,
+      feedback
+    };
+
+    const user = new User(userData);
+    try {
+      const id = await user.save();
+      resolve({
+        status: 1,
+        msg: 'Success',
+        data: {
+          id,
+          ...userData
+        }
+      });
+    } catch (err) {
+      console.error("SAVE ERROR:", err);
+      resolve({
+        status: 0,
+        msg: 'Failed to save user data',
+        error: err?.message || err
+      });
+    }
+
   });
 }
