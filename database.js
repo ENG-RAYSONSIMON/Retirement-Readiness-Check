@@ -1,11 +1,11 @@
 import mysql from 'mysql2/promise';
-import SystemParams from './SystemParams.js';
+import  Dotenv  from 'dotenv';
+Dotenv.config();
 
 const pool = mysql.createPool({
-  host: SystemParams.MYSQL_DB_HOST,
-  user: SystemParams.MYSQL_DB_USER,
-  database: SystemParams.MYSQL_DB_NAME,  
-  password: SystemParams.MYSQL_DB_PASSWORD,
+  host: process.env.MYSQL_DB_HOST,
+  user: process.env.MYSQL_DB_USER,
+  database: process.env.MYSQL_DB_NAME,  
   waitForConnections: true,               
   connectionLimit: 10,                    
   queueLimit: 0                          
