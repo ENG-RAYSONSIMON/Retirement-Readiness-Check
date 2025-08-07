@@ -6,7 +6,7 @@ export function processRetirement(input) {
     const requiredFields = [
       'name', 'age', 'occupation', 'phone', 'email',
       'ageToRetire', 'mounthlyExpenditure', 'saving', 'investment', 'asserts',
-      'healthInsurance', 'loan', 'loanAmount',
+      'healthInsurance', 'loan',
       'willPlan', 'projects', 'mounthlyInvestmentPlan',
       'mounthlyExpenditureAfterRetire', 'incomeEarnedFree', 'tenYearsPlan'
     ];
@@ -85,5 +85,34 @@ export function processRetirement(input) {
       });
     }
 
+  });
+}
+
+export function getAllUsersData() {
+  return new Promise(async (resolve) => {
+    try {
+      const data = await User.getData();
+
+      if (!data || data.length === 0) {
+        return resolve({
+          status: 0,
+          msg: 'No user data found'
+        });
+      }
+
+      resolve({
+        status: 1,
+        msg: 'User data retrieved successfully',
+        data
+      });
+
+    } catch (err) {
+      console.error("GET DATA ERROR:", err);
+      resolve({
+        status: 0,
+        msg: 'Failed to retrieve user data',
+        error: err?.message || err
+      });
+    }
   });
 }

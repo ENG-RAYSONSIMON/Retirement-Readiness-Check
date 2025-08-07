@@ -49,6 +49,13 @@ class User {
     const [result] = await database.execute(sql, values);
     return result.insertId;
   }
+  
+  static async getData() {
+    const sql = `SELECT * FROM users ORDER BY dateCreated DESC`;
+    const [rows] = await database.execute(sql);
+    return rows;
+  }
+
 }
 
 export default User;

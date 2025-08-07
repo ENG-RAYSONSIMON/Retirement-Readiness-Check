@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { processRetirement } from './processor.js';
+import { processRetirement, getAllUsersData } from './processor.js';
 
 dotenv.config();
 const port = process.env.PORT;
@@ -22,11 +22,16 @@ app.get('/', (req, res) => {
 app.post('/api/evaluate', async (req, res) => {
   let input = req.body;
 
-  await processRetirement(input).then(async (result) => {
-
+  await processRetirement(input).then((result) => {
     res.json(result);
   })
 
+});
+
+app.get('/api/all-users', async (req, res) => {
+  await getAllUsersData().then((result) => {
+    res.json(result);
+  })
 });
 
 
