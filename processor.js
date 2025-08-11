@@ -49,18 +49,100 @@ export function processRetirement(input) {
     const score = score1 + score2 + score3 + score4;
     const totalPercentage = (score / 50) * 100;
 
-    let feedback = '';
-    if (totalPercentage <= 30) feedback = 'Hatari kubwa! Hujajiandaa kifedha.';
-    else if (totalPercentage <= 60) feedback = 'Kuna mapengo makubwa, unahitaji marekebisho.';
-    else if (totalPercentage <= 90) feedback = 'Unaelekea salama, bado unahitaji kuboresha.';
-    else feedback = 'Uko salama kifedha kwa kustaafu.';
+ let feedback = '';
+const name = input.name;
+const targetAmount = 200_000_000;
+const dailyInvestment = 28_700;
+const monthlyInvestment = dailyInvestment * 30;
+const retirementAge = input.ageToRetire;
+const passiveIncomeGoal = 2_000_000;
+
+function investmentPlan(years) {
+  const totalDays = years * 365;
+  const totalInvestment = dailyInvestment * totalDays;
+  return `
+Nguvu ya Buku Program:
+- Mwaka kuanza uwekezaji: ${input.age} (${years} years to invest)
+- Siku za uwekezaji: ${totalDays}
+- Jumla ya uwekezaji kwa siku (TZS ${dailyInvestment.toLocaleString()}): ${totalInvestment.toLocaleString()}
+- Thamani inayokadiriwa ya uwekezaji: ${targetAmount.toLocaleString()}
+Kwa kufuata mpango huu, ${name} utakuwa na kipato kisichopungua TZS ${passiveIncomeGoal.toLocaleString()} kwa mwezi baada ya kustaafu.`;
+}
+
+if (totalPercentage <= 30) {
+  feedback = `
+TAFSIRI YA UTAAYARI: ${name}, kiwango chako cha utayari wa kustaafu kipo chini. 
+Una baadhi ya misingi ya kifedha lakini unahitaji mpango imara zaidi.
+
+MAPENDEKEZO:
+1. Anza mara moja mpango wa urithi (wosia) ili kulinda mali zako.
+2. Kuongeza uwekezaji wa kila mwezi: ${investmentPlan(yearsLeftBeforeRetire)}
+3. Badilisha mali zisizolipa ili kuleta kipato.
+4. Ondoa madeni yote kabla ya kustaafu.
+5. Jiunge na mpango wa ushauri wa kifedha.
+`;
+}
+else if (totalPercentage <= 60) {
+  feedback = `
+TAFSIRI YA UTAAYARI: ${name}, uko kwenye hatua ya kati ya maandalizi ya kustaafu. 
+Una misingi mizuri lakini bado kuna nafasi kubwa ya kuboresha.
+
+MAPENDEKEZO:
+1. Kuandaa mpango wa urithi haraka iwezekanavyo.
+2. Kuimarisha uwekezaji: ${investmentPlan(yearsLeftBeforeRetire)}
+3. Hakikisha mali zisizolipa zinakuwa na faida.
+4. Punguza deni na ongeza akiba.
+5. Endelea kushirikiana na mshauri wa kifedha.
+`;
+}
+else if (totalPercentage <= 90) {
+  feedback = `
+TAFSIRI YA UTAAYARI: ${name}, uko karibu sana na uhuru wa kifedha. 
+Mikakati yako iko vizuri lakini bado kuna hatua chache za mwisho.
+
+MAPENDEKEZO:
+1. Kamalisha mpango wa urithi.
+2. Endelea na uwekezaji: ${investmentPlan(yearsLeftBeforeRetire)}
+3. Hakikisha miradi yote inaleta faida endelevu.
+4. Lipa deni lililobaki.
+`;
+}
+else {
+  feedback = `
+TAFSIRI YA UTAAYARI: Hongera ${name}! Uko tayari kustaafu kifedha.
+Endelea kulinda mali na miradi yako ili kudumisha uhuru wa kifedha.
+
+MAPENDEKEZO:
+1. Weka mipango ya urithi na uendeleze urithi wa kifedha kwa familia yako.
+2. Endelea kufuatilia uwekezaji: ${investmentPlan(yearsLeftBeforeRetire)}
+3. Kudumisha maisha bila madeni.
+`;
+}
 
     const userData = {
       ...input,
+      personalDetails: {
+        name: input.name,
+        age: input.age,
+        occupation: input.occupation,
+        phone: input.phone,
+        email: input.email,
+        mounthlyExpenditure:input.mounthlyExpenditure,
+        saving:input.saving,
+        investment:input.investment,
+        asserts:input.asserts,
+        healthInsurance:input.healthInsurance,
+        loan:input.loan,
+        projects:input.projects,
+        willPlan:input.willPlan,
+        mounthlyInvestmentPlan:input.mounthlyInvestmentPlan,
+        
+      },
       yearsLeftBeforeRetire,
       financialFreedom,
       percentFinancialFreedom,
       score,
+      
       totalPercentage,
       feedback
     };
