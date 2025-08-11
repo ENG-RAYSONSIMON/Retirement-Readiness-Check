@@ -13,8 +13,8 @@ class User {
         saving, investment, asserts,
         healthInsurance, loan, loanAmount,
         financialFreedom, percentFinancialFreedom, willPlan, projects, mounthlyInvestmentPlan,
-        mounthlyExpenditureAfterRetire, incomeEarnedFree, tenYearsPlan, score, totalPercentage, feedback, dateCreated
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        mounthlyExpenditureAfterRetire, incomeEarnedFree, tenYearsPlan, score, totalPercentage, feedback, dateCreated, state
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -43,7 +43,8 @@ class User {
       this.score,
       this.totalPercentage,
       this.feedback,
-      new Date()
+      new Date(),
+      "waiting"
     ];
 
     const [result] = await database.execute(sql, values);
@@ -54,6 +55,23 @@ class User {
     const sql = `SELECT * FROM users ORDER BY dateCreated DESC`;
     const [rows] = await database.execute(sql);
     return rows;
+  }
+
+  static async toggleState(userId) {
+    const sqlGet = `SELECT state FROM users WHERE id = ?`;
+    const [rows] = await database.execute(sqlGet, [userId]);
+
+    if (!rows.length) {
+      throw new Error("User not found");
+    }
+
+    const currentState = rows[0].state;
+    const newState = currentState === "waiting" ? "consulted" : "waiting";
+
+    const sqlUpdate = `UPDATE users SET state = ? WHERE id = ?`;
+    await database.execute(sqlUpdate, [newState, userId]);
+
+    return { id: userId, previousState: currentState, newState };
   }
 
 }

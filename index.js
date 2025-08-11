@@ -2,10 +2,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { processRetirement, getAllUsersData } from './processor.js';
+import { processRetirement, getAllUsersData, toggleUserState } from './processor.js';
 
 dotenv.config();
-const port = process.env.PORT;
 
 const app = express();
 
@@ -34,7 +33,18 @@ app.get('/api/all-users', async (req, res) => {
   })
 });
 
+app.put('/api/users/:id/toggle-state', async (req, res) => {
+  await toggleUserState(req.params.id).then((result) => {
+    res.json({
+      message: "User state updated successfully",
+      data: result
+    });
+  }).catch(err => {
+    res.status(500).json({ error: err.message });
+  });
+});
 
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

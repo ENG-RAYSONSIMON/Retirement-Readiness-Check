@@ -116,3 +116,23 @@ export function getAllUsersData() {
     }
   });
 }
+
+export function toggleUserState(userId) {
+  return new Promise(async (resolve) => {
+    try {
+      const result = await User.toggleState(userId);
+      resolve({
+        status: 1,
+        msg: 'User state toggled successfully',
+        data: result
+      });
+    } catch (err) {
+      console.error("TOGGLE STATE ERROR:", err);
+      resolve({
+        status: 0,
+        msg: 'Failed to toggle user state',
+        error: err?.message || err
+      });
+    }
+  });
+}
