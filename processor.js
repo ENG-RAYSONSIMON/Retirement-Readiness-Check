@@ -136,6 +136,7 @@ MAPENDEKEZO:
         projects:input.projects,
         willPlan:input.willPlan,
         mounthlyInvestmentPlan:input.mounthlyInvestmentPlan,
+        loanAmount:input.loanAmount
         
       },
       yearsLeftBeforeRetire,
