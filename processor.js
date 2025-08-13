@@ -52,7 +52,7 @@ export function processRetirement(input) {
  let feedback = '';
 const name = input.name;
 const targetAmount = 200_000_000;
-const dailyInvestment = 28_700;
+const dailyInvestment = 1000;
 const monthlyInvestment = dailyInvestment * 30;
 const retirementAge = input.ageToRetire;
 const passiveIncomeGoal = 2_000_000;
@@ -60,13 +60,13 @@ const passiveIncomeGoal = 2_000_000;
 function investmentPlan(years) {
   const totalDays = years * 365;
   const totalInvestment = dailyInvestment * totalDays;
+
   return `
 Nguvu ya Buku Program:
 - Mwaka kuanza uwekezaji: ${input.age} (${years} years to invest)
 - Siku za uwekezaji: ${totalDays}
-- Jumla ya uwekezaji kwa siku (TZS ${dailyInvestment.toLocaleString()}): ${totalInvestment.toLocaleString()}
-- Thamani inayokadiriwa ya uwekezaji: ${targetAmount.toLocaleString()}
-Kwa kufuata mpango huu, ${name} utakuwa na kipato kisichopungua TZS ${passiveIncomeGoal.toLocaleString()} kwa mwezi baada ya kustaafu.`;
+- Jumla ya uwekezaji kwa siku (TZS ${dailyInvestment.toLocaleString()})
+-Kwa kufuata mpango huu, ${name} utakuwa na kipato kisichopungua TZS ${totalInvestment.toLocaleString()} baada ya kustaafu,Hii ni nje ya Faida utakayopata kulingana na Gawio la Mfuko husika`;
 }
 
 if (totalPercentage <= 30) {
