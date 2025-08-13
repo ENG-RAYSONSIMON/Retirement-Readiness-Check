@@ -62,7 +62,7 @@ function investmentPlan(years) {
   const totalInvestment = dailyInvestment * totalDays;
   return `
 Nguvu ya Buku Program:
-- Mwaka kuanza uwekezaji: ${input.age} (${years} years to invest)
+- Miaka iliyobaki ya uwekezaji: ${yearsLeftBeforeRetire} 
 - Siku za uwekezaji: ${totalDays}
 - Jumla ya uwekezaji kwa siku (TZS ${dailyInvestment.toLocaleString()}): ${totalInvestment.toLocaleString()}
 - Thamani inayokadiriwa ya uwekezaji: ${targetAmount.toLocaleString()}
